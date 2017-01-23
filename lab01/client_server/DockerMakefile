@@ -1,0 +1,55 @@
+
+# distributed algorithms, n.dulay, 4 jan 17
+# simple makefile for docker, v1
+
+LOCAL_DIR  = $(HOME)/co347/lab01/client_server
+D_HOSTS    = 3
+
+D_SUBNET   = 172.19.0
+D_NETWORK  = distalgorithms 
+D_HOSTNAME = host
+D_HOST_DIR = /code
+D_IMAGE    = msaraiva/erlang
+D_CMD      = 
+
+create:
+	docker network create \
+	  --subnet=$(D_SUBNET).0/24 \
+	  --gateway=$(D_SUBNET).254 \
+  	  $(D_NETWORK)
+
+	for k in $$(seq 1 1 $(D_HOSTS)); do \
+	  docker run -itd \
+	    -v $(LOCAL_DIR):$(D_HOST_DIR) \
+            --net=$(D_NETWORK) \
+            --name $(D_HOSTNAME)$$k \
+            $(D_IMAGE) $(D_CMD); \
+	done
+
+	make -f DockerMakefile ls
+	# docker ps -n $(D_HOSTS)
+
+ls:
+	echo
+	docker network ls
+	echo
+	docker ps -a
+	echo
+
+netls:
+	docker network inspect $(D_NETWORK)
+
+host1 host2 host3 host4 host5:
+	docker attach $@
+
+clean:
+	docker rm -f `docker ps -a -q`
+	# docker rm -f `docker ps -q --filter network=$(D_NETWORK)`
+	docker network rm $(D_NETWORK)
+	make -f DockerMakefile ls
+
+clean2:
+	docker network rm $(D_NETWORK)
+	make -f DockerMakefile ls
+
+
