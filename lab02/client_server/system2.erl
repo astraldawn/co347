@@ -13,19 +13,13 @@ start() ->
     [2, 7], [1, 3, 4], [2, 4, 5], [2, 3, 6], [3],
     [4], [1, 8], [7, 9, 10], [8, 10], [8, 9]
   ],
-  Procs = lists:map(
-    fun(Num) ->
-        spawn(peer1, start, [])
-    end,
-    lists:seq(1, N)
-    ),
+  Procs = [spawn(peer1, start, []) || _ <- lists:seq(1, N)],
   lists:map(
     fun(Num) ->
         Neighbours = [lists:nth(X, Procs) || X <- lists:nth(Num,NeighbourList)],
         lists:nth(Num, Procs) ! {bind, Neighbours}
     end,
     lists:seq(1, N)),
-  [H|T] = Procs,
   lists:nth(5, Procs) ! {message, 0}.
 
 
