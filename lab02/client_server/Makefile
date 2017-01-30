@@ -4,7 +4,7 @@
 
 .SUFFIXES: .erl .beam
 
-MODULES  = system1 system2 system3 client server
+MODULES  = system1 system2 system3 client server peer1
 HOSTS    = 3
 HOSTSm1  = 2
 

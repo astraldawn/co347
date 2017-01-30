@@ -8,12 +8,20 @@
 -export([start/0]).
  
 start() ->
-  S  = spawn(server, start, []),
   N = 10,
-  lists:map(
+  Procs = lists:map(
     fun(Num) ->
-        C = spawn(client, start, []),
-        C ! {bind, S}
+        spawn(peer1, start, [])
     end,
     lists:seq(1, N)
-    ).
+    ),
+  lists:map(
+    fun(Proc) ->
+        Neighbours = [X || X <- Procs, X /= Proc],
+        Proc ! {bind, Neighbours}
+    end,
+    Procs),
+  [H|T] = Procs,
+  H ! {message}.
+
+
