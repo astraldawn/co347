@@ -1,0 +1,42 @@
+#####
+25  #
+#####
+{task1, start, 1000, 3000}
+--------------------------
+2: {1000,1000} {1000,1000} {1000,1000} {1000,1000} {1000,1000} 
+1: {1000,1000} {1000,1000} {1000,1000} {1000,1000} {1000,1000} 
+5: {1000,1000} {1000,1000} {1000,1000} {1000,1000} {1000,1000} 
+4: {1000,1000} {1000,1000} {1000,1000} {1000,1000} {1000,1000} 
+3: {1000,1000} {1000,1000} {1000,1000} {1000,1000} {1000,1000} 
+
+{task1, start, 0, 3000}
+-----------------------
+4: {444812,619682} {444812,606562} {444812,562440} {444812,444812} 
+{444812,565936} 
+
+5: {565937,619682} {565937,606562} {565937,562440} {565937,444812} 
+{565937,565936} 
+
+2: {606562,619682} {606562,606562} {606562,562440} {606562,444812} 
+{606562,565936} 
+
+1: {619682,619682} {619682,606562} {619682,562440} {619682,444812} 
+{619682,565936} 
+
+3: {562440,619682} {562440,606562} {562440,562440} {562440,444812} 
+{562440,565936} 
+
+
+For the first message {task1, start, 1000, 3000}, the output is as expected,
+with 1000 messages being sent and received by each process. For the second
+message {task1, start, 0, 3000}, processes will not broadcast an equal amount
+of messages as message passing is asynchronous. If process_i broadcasts N
+messages, all processes should receive N messages from process_i. However,
+processes must terminate once the timeout has elasped. This results in
+process_5 broadcasting 565937 messages but all processes only receiving 565936
+messages as the message to terminate is received before the processes receive
+the last message broadcast from process_5.
+
+#####
+31  #
+#####
