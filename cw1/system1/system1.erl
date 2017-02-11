@@ -18,5 +18,5 @@ init_process(Num, PIDs) ->
 start_task1(Num, PIDs) ->
 % Start the task
   CID = lists:nth(Num, PIDs),
-  CID ! {task1, start, 1000, 3000}.
+  CID ! {task1, start, 0, 3000}.
   % CID ! {task1, start, 0, 3000}.

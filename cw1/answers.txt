@@ -92,6 +92,7 @@ task1(ID, PL_ID, Broadcast, Max_messages) ->
   end.
 
 As messages are received by each process at a slower rate (due to the longer
-path), more time is spent in the after section of the receive block. When the
-process  terminates, the PL component will attempt to deliver the remaining
-messages but these messages are not recorded as being received.
+path), more time is spent in the after section of the receive block and each
+process broadcasts a greater number of messages. When the process terminates,
+the PL component will attempt to deliver the remaining messages but these
+messages are not recorded as being received.

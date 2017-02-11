@@ -45,5 +45,5 @@ wait_links_received(Count, N, LinkMap) ->
 start_task1(CID, LinkMap) ->
 % Start the task by using pl_deliver to PL components
   PL_ID = maps:get(CID, LinkMap),
-  Message = {task1, start, 100, 1000},
+  Message = {task1, start, 0, 1000},
   PL_ID ! {pl_send, Message, CID}.

@@ -23,12 +23,13 @@ wait_links(App) ->
 
 next(App, LinkMap) ->
   receive
-    {pl_deliver, Message} ->
+    {pl_transmit, Message} ->
       % Deliver message to app
-      App ! Message;
+      App ! {pl_deliver, Message};
     {pl_send, Message, Dest} ->
       % Send a message to the PL component of dest process
       Dest_PL_ID = maps:get(Dest, LinkMap),
-      Dest_PL_ID ! {pl_deliver, Message}
+      % Simulate tranmission across network
+      Dest_PL_ID ! {pl_transmit, Message}
   end,
   next(App, LinkMap).

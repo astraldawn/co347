@@ -13,7 +13,8 @@ start() ->
 next(ID, PL_ID, Broadcast) ->
 % Separated out to use after -> 0 to broadcast
   receive
-    {task1, start, Max_messages, Timeout} ->
+    {pl_deliver, Message} ->
+      {task1, start, Max_messages, Timeout} = Message,
       % Delay sending of terminate message
       timer:send_after(Timeout, PL_ID, {pl_send, terminate, ID}),
       task1(ID, PL_ID, Broadcast, Max_messages) % Actually being the task
@@ -21,12 +22,15 @@ next(ID, PL_ID, Broadcast) ->
 
 task1(ID, PL_ID, Broadcast, Max_messages) ->
   receive
-    terminate ->
-      % Receive and handle the timeout message
-      print_output(ID, Broadcast);
-    {task1, message, Source} ->
-      % Handle receiving messages
-      receive_message(ID, PL_ID, Broadcast, Max_messages, Source)
+    {pl_deliver, Message} ->
+      case Message of
+        terminate ->
+        % Receive and handle the timeout message
+          print_output(ID, Broadcast);
+        {task1, message, Source} ->
+        % Handle receiving messages
+          receive_message(ID, PL_ID, Broadcast, Max_messages, Source)
+      end
   after
     0 -> % If there are no more messages to receive, broadcast
       attempt_broadcast(ID, PL_ID, Broadcast, Max_messages)
