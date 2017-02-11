@@ -1,6 +1,6 @@
-#####
-25  #
-#####
+##############################
+25  (code in system1 folder) #
+##############################
 {task1, start, 1000, 3000}
 --------------------------
 2: {1000,1000} {1000,1000} {1000,1000} {1000,1000} {1000,1000} 
@@ -37,6 +37,61 @@ process_5 broadcasting 565937 messages but all processes only receiving 565936
 messages as the message to terminate is received before the processes receive
 the last message broadcast from process_5.
 
-#####
-31  #
-#####
+#############################
+31 (code in system2 folder) #
+#############################
+{task1, start, 100, 1000}
+-------------------------
+4: {100,100} {100,100} {100,100} {100,100} {100,100} 
+1: {100,100} {100,100} {100,100} {100,100} {100,100} 
+3: {100,100} {100,100} {100,100} {100,100} {100,100} 
+5: {100,100} {100,100} {100,100} {100,100} {100,100} 
+2: {100,100} {100,100} {100,100} {100,100} {100,100} 
+
+
+{task1, start, 0, 1000}
+-----------------------
+1: {48449,47257} {48449,90095} {48449,76172} {48449,79399} {48449,54915}
+
+5: {139998,48449} {139998,103556} {139998,90929} {139998,95566} 
+{139998,64582} 
+
+2: {243158,48449} {243158,114010} {243158,106336} {243158,111131}
+{243158,77523} 
+
+4: {516425,48449} {516425,159064} {516425,143279} {516425,172378}
+{516425,134590} 
+
+3: {762472,48449} {762472,188630} {762472,166891} {762472,172758}
+{762472,139998} 
+
+
+For the first message {task1, start, 100, 1000}, the output is as expected,
+with 100 messages being sent and received by each process. However, we note
+that for the second message {task1, start, 0, 1000}, most processes broadcast
+more messages than they receive. This can be explained by components
+attempting to continuously broadcast messages. However, messages are not
+delivered directly but instead have to be passed through the PL component.
+This increases the time it takes for each receive message to be delivered. For
+example, if process_1 sends a message to process_2, the message goes from
+app_1 -> pl_1 -> pl_2 -> app_2.
+
+Consider the code from app.erl
+
+task1(ID, PL_ID, Broadcast, Max_messages) ->
+  receive
+    terminate ->
+      % Receive and handle the timeout message
+      print_output(ID, Broadcast);
+    {task1, message, Source} ->
+      % Handle receiving messages
+      receive_message(ID, PL_ID, Broadcast, Max_messages, Source)
+  after
+    0 -> % If there are no more messages to receive, broadcast
+      attempt_broadcast(ID, PL_ID, Broadcast, Max_messages)
+  end.
+
+As messages are received by each process at a slower rate (due to the longer
+path), more time is spent in the after section of the receive block. When the
+process  terminates, the PL component will attempt to deliver the remaining
+messages but these messages are not recorded as being received.

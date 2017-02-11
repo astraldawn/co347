@@ -4,7 +4,7 @@
 
 .SUFFIXES: .erl .beam
 
-MODULES  = system2 process
+MODULES  = system2 process app pl
 HOSTS    = 3
 HOSTSm1  = 2
 
