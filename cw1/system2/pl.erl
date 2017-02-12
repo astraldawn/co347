@@ -26,7 +26,7 @@ next(App, LinkMap) ->
     {pl_transmit, Message} ->
       % Deliver message to app
       App ! {pl_deliver, Message};
-    {pl_send, Message, Dest} ->
+    {pl_send, Dest, Message} ->
       % Send a message to the PL component of dest process
       Dest_PL_ID = maps:get(Dest, LinkMap),
       % Simulate tranmission across network

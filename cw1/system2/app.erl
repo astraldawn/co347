@@ -16,7 +16,7 @@ next(ID, PL_ID, Broadcast) ->
     {pl_deliver, Message} ->
       {task1, start, Max_messages, Timeout} = Message,
       % Delay sending of terminate message
-      timer:send_after(Timeout, PL_ID, {pl_send, terminate, ID}),
+      timer:send_after(Timeout, PL_ID, {pl_send, ID, terminate}),
       task1(ID, PL_ID, Broadcast, Max_messages) % Actually being the task
   end.
 
@@ -39,15 +39,15 @@ task1(ID, PL_ID, Broadcast, Max_messages) ->
 attempt_broadcast(ID, PL_ID, Broadcast, Max_messages) ->
 % Broadcast to all peers and update the map
   NewBroadcast = maps:map(
-    fun(K, V) ->
+    fun(Dest, V) ->
       {Sent, Received} = V,
       Message = {task1, message, ID},
       if
         Sent < Max_messages ->
-          PL_ID ! {pl_send, Message, K},
+          PL_ID ! {pl_send, Dest, Message},
           {Sent+1, Received};
         Max_messages == 0 ->
-          PL_ID ! {pl_send, Message, K},
+          PL_ID ! {pl_send, Dest, Message},
           {Sent+1, Received};
         true ->
           V

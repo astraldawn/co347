@@ -46,4 +46,4 @@ start_task1(CID, LinkMap) ->
 % Start the task by using pl_deliver to PL components
   PL_ID = maps:get(CID, LinkMap),
   Message = {task1, start, 0, 1000},
-  PL_ID ! {pl_send, Message, CID}.
+  PL_ID ! {pl_send, CID, Message}.
