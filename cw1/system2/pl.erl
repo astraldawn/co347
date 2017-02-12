@@ -4,11 +4,8 @@
 
 start() ->
   receive
-    {create_app, PID, PIDs} ->
-      % Create associated app 
-      App = spawn(app, start, []),
-      App ! {bind, PID, self(), PIDs},
-      PID ! created,
+    {bind_app, App} ->
+      % Bind
       wait_links(App)
   end.
 
