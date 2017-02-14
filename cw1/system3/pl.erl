@@ -4,29 +4,29 @@
 
 start() ->
   receive
-    {bind_app, App} ->
-      % Bind app, then wait for the link map
-      wait_links(App)
+    {bind, BEB} ->
+      % Bind BEB, then wait for the link map
+      wait_links(BEB)
   end.
 
-wait_links(App) ->
+wait_links(BEB) ->
 % Wait for map of links (to the PL components of other processes)
   receive
     {pl_link_map, SYS, LinkMap} ->
       % Everything is ready
       SYS ! pl_link_received,
-      next(App, LinkMap)
+      next(BEB, LinkMap)
   end.
 
-next(App, LinkMap) ->
+next(BEB, LinkMap) ->
   receive
     {pl_transmit, Message} ->
-      % Deliver message to app
-      App ! {pl_deliver, Message};
+      % Deliver message to BEB
+      BEB ! {pl_deliver, Message};
     {pl_send, Dest, Message} ->
       % Send a message to the PL component of dest process
       Dest_PL_ID = maps:get(Dest, LinkMap),
       % Simulate tranmission across network
       Dest_PL_ID ! {pl_transmit, Message}
   end,
-  next(App, LinkMap).
+  next(BEB, LinkMap).

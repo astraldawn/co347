@@ -4,7 +4,7 @@
 
 .SUFFIXES: .erl .beam
 
-MODULES  = system2 process app pl
+MODULES  = system3 process app pl beb
 HOSTS    = 3
 HOSTSm1  = 2
 
@@ -29,7 +29,7 @@ clean:
 
 # LOCAL RUN ===================================================
 
-SYSTEM    = system2
+SYSTEM    = system3
 
 L_HOST    = localhost.localdomain
 L_ERL     = erl -smp enable -noshell -pa ebin -setcookie pass
