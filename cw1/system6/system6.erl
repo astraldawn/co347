@@ -1,6 +1,6 @@
 %%% Mark Lee (cyl113)
  
--module(system5).
+-module(system6).
 -export([start/0]).
 
 start() ->
@@ -48,13 +48,13 @@ start_task1(CID, LinkMap) ->
   PL_ID = maps:get(CID, LinkMap),
 
   % We use pl_transmit instead of pl_send to start everything
-  Max_messages = 100,
+  Max_messages = 0,
   if 
     CID == '3' ->
-      Message = {task1, start, Max_messages, 5},
+      Message = {data, 0, {task1, start, Max_messages, 5}},
       PL_ID ! {pl_transmit, Message};
     true ->
-      Message = {task1, start, Max_messages, 1000},
+      Message = {data, 0, {task1, start, Max_messages, 5000}},
       PL_ID ! {pl_transmit, Message}
   end.
 
