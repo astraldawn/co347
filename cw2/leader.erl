@@ -30,11 +30,7 @@ next(Acceptors, Replicas, Ballot_Num, Active, Proposals) ->
         RBallot_Num == Ballot_Num -> % Ignore the old ballot number
           NewProposals = pmax(Proposals, Pvalues),
           ProposalList = maps:to_list(NewProposals),
-          if 
-            length(ProposalList) > 0 -> 
-              [spawn(commander, start, [self(), Acceptors, Replicas, {Ballot_Num, S, C}]) || {S, C} <- ProposalList];
-            true -> ok
-          end,
+          [spawn(commander, start, [self(), Acceptors, Replicas, {Ballot_Num, S, C}]) || {S, C} <- ProposalList],
           next(Acceptors, Replicas, Ballot_Num, true, NewProposals);
         true -> ok
       end;
