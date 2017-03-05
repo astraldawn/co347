@@ -18,7 +18,7 @@ next(Leader, Acceptors, B, WaitFor, Pvalues) ->
             S_WaitFor < S_Acceptors / 2 ->
               Leader ! {adopted, B, NewPvalues},
               exit(normal);
-            true -> false
+            true -> ok
           end,
           next(Leader, Acceptors, B, NewWaitFor, NewPvalues);
         true ->

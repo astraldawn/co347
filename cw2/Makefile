@@ -4,7 +4,7 @@
 
 .SUFFIXES: .erl .beam
 
-MODULES  = client server database system replica acceptor scout leader
+MODULES  = client server database system replica acceptor scout leader commander
 HOSTS    = 3
 HOSTSm1  = 2
 

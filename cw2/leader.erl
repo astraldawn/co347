@@ -15,24 +15,28 @@ next(Acceptors, Replicas, Ballot_Num, Active, Proposals) ->
       In_Proposals = maps:is_key(S, Proposals),
       if
         In_Proposals == false ->
-          NewProposals = maps:update(S, C, Proposals),
+          NewProposals = maps:put(S, C, Proposals),
           if 
             Active ->
               Pvalue = {Ballot_Num, S, C},
               spawn(commander, start, [self(), Acceptors, Replicas, Pvalue]);
-            true -> false
+            true -> ok
           end,
           next(Acceptors, Replicas, Ballot_Num, Active, NewProposals);
-        true -> false
+        true -> ok
       end;
     {adopted, RBallot_Num, Pvalues} ->
       if
         RBallot_Num == Ballot_Num -> % Ignore the old ballot number
           NewProposals = pmax(Proposals, Pvalues),
           ProposalList = maps:to_list(NewProposals),
-          [spawn(commander, start, [self(), Acceptors, Replicas, {Ballot_Num, S, C}]) || {S, C} <- ProposalList],
+          if 
+            length(ProposalList) > 0 -> 
+              [spawn(commander, start, [self(), Acceptors, Replicas, {Ballot_Num, S, C}]) || {S, C} <- ProposalList];
+            true -> ok
+          end,
           next(Acceptors, Replicas, Ballot_Num, true, NewProposals);
-        true -> false
+        true -> ok
       end;
     {preempted, B_Prime} ->
       {R_Prime, _} = B_Prime,
@@ -41,15 +45,14 @@ next(Acceptors, Replicas, Ballot_Num, Active, Proposals) ->
           NewBallot_Num = {R_Prime + 1, self()},
           spawn(scout, start, [self(), Acceptors, NewBallot_Num]),
           next(Acceptors, Replicas, NewBallot_Num, false, Proposals);
-        true -> false
+        true -> ok
       end
   end,
   next(Acceptors, Replicas, Ballot_Num, Active, Proposals).
 
 pmax(Proposals, Pvalues) ->
-  PvaluesMap = maps:from_list(sets:to_list(Pvalues)),
   PvaluesList = sets:to_list(Pvalues),
-  Slots = maps:keys(PvaluesMap),
+  Slots = sets:to_list(sets:from_list([S || {_, S, _} <- PvaluesList])),
   MaxSlotsList = lists:map(
     fun(Slot) ->
       CurSlotElems = lists:filter(
@@ -60,7 +63,9 @@ pmax(Proposals, Pvalues) ->
           end
         end,
         PvaluesList),
-      lists:max(CurSlotElems) % Return maximum for indiv slot (exploiting lexi ordering)
+      MaxElem = lists:max(CurSlotElems), % Return maximum for indiv slot (exploiting lexi ordering)
+      {_, S, C} = MaxElem,
+      {S, C}
     end,
     Slots),
   MaxSlotsSet = sets:from_list(MaxSlotsList),

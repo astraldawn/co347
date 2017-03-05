@@ -3,7 +3,7 @@
 
 start(Leader, Acceptors, Replicas, Pvalue) ->
   [ Acceptor ! {p2a, self(), Pvalue} || Acceptor <- Acceptors ],
-  next(Leader, Acceptors, Replicas, Pvalue, Acceptors).
+  next(Leader, sets:from_list(Acceptors), Replicas, Pvalue, sets:from_list(Acceptors)).
 
 next(Leader, Acceptors, Replicas, Pvalue, WaitFor) ->
   {B, S, C} = Pvalue,
@@ -18,12 +18,12 @@ next(Leader, Acceptors, Replicas, Pvalue, WaitFor) ->
             S_WaitFor < S_Acceptors / 2 ->
               [Replica ! {decision, S, C} || Replica <- Replicas],
               exit(normal);
-            true -> false
+            true -> ok
           end,
-          next(Leader, Acceptors, Replicas, Pvalues, NewWaitFor);
+          next(Leader, Acceptors, Replicas, Pvalue, NewWaitFor);
         true ->
           Leader ! {preempted, B_Prime},
           exit(normal)
       end
   end,
-  next(Leader, Acceptors, Replicas, Pvalues, WaitFor).
+  next(Leader, Acceptors, Replicas, Pvalue, WaitFor).
