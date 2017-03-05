@@ -1,3 +1,4 @@
+%%% Chu Lee (cyl113) and Royson Lee (dsl114)
 -module(leader).
 -export([start/0]).
 
@@ -30,7 +31,8 @@ next(Acceptors, Replicas, Ballot_Num, Active, Proposals) ->
         RBallot_Num == Ballot_Num -> % Ignore the old ballot number
           NewProposals = pmax(Proposals, Pvalues),
           ProposalList = maps:to_list(NewProposals),
-          [spawn(commander, start, [self(), Acceptors, Replicas, {Ballot_Num, S, C}]) || {S, C} <- ProposalList],
+          [spawn(commander, start, [self(), Acceptors, Replicas, 
+            {Ballot_Num, S, C}]) || {S, C} <- ProposalList],
           next(Acceptors, Replicas, Ballot_Num, true, NewProposals);
         true -> ok
       end;
@@ -52,7 +54,8 @@ pmax(Proposals, Pvalues) ->
   MaxSlotsList = lists:map(
     fun(Slot) ->
       CurSlotElems = [{B, S, C} || {B, S, C} <- PvaluesList, S == Slot],
-      MaxElem = lists:max(CurSlotElems), % Return maximum for indiv slot (exploiting lexi ordering)
+      % Return maximum for indiv slot (exploiting lexi ordering)
+      MaxElem = lists:max(CurSlotElems), 
       {_, S, C} = MaxElem,
       {S, C}
     end,

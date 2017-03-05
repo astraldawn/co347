@@ -1,9 +1,11 @@
+%%% Chu Lee (cyl113) and Royson Lee (dsl114)
 -module(scout).
 -export([start/3]).
 
 start(Leader, Acceptors, B) ->
   [ Acceptor ! {p1a, self(), B} || Acceptor <- Acceptors ],
-  next(Leader, sets:from_list(Acceptors), B, sets:from_list(Acceptors), sets:new()).
+  next(Leader, sets:from_list(Acceptors), B, 
+      sets:from_list(Acceptors), sets:new()).
 
 next(Leader, Acceptors, B, WaitFor, Pvalues) ->
   receive

@@ -1,4 +1,4 @@
-
+%%% Chu Lee (cyl113) and Royson Lee (dsl114)
 %%% distributed algorithms, n.dulay 27 feb 17
 %%% coursework 2, paxos made moderately complex
 

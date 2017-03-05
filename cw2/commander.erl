@@ -1,9 +1,11 @@
+%%% Chu Lee (cyl113) and Royson Lee (dsl114)
 -module(commander).
 -export([start/4]).
 
 start(Leader, Acceptors, Replicas, Pvalue) ->
   [ Acceptor ! {p2a, self(), Pvalue} || Acceptor <- Acceptors ],
-  next(Leader, sets:from_list(Acceptors), Replicas, Pvalue, sets:from_list(Acceptors)).
+  next(Leader, sets:from_list(Acceptors), Replicas, 
+      Pvalue, sets:from_list(Acceptors)).
 
 next(Leader, Acceptors, Replicas, Pvalue, WaitFor) ->
   {B, S, C} = Pvalue,
