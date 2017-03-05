@@ -12,7 +12,7 @@ next(Leader, Acceptors, Replicas, Pvalue, WaitFor) ->
       if
         B == B_Prime ->
           NewWaitFor = sets:del_element(Acceptor, WaitFor),
-          S_WaitFor = sets:size(WaitFor),
+          S_WaitFor = sets:size(NewWaitFor),
           S_Acceptors = sets:size(Acceptors),
           if 
             S_WaitFor < S_Acceptors / 2 ->

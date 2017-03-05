@@ -12,7 +12,7 @@ next(Leader, Acceptors, B, WaitFor, Pvalues) ->
         B == B_Prime ->
           NewPvalues = sets:union(Pvalues, Accepted),
           NewWaitFor = sets:del_element(Acceptor, WaitFor),
-          S_WaitFor = sets:size(WaitFor),
+          S_WaitFor = sets:size(NewWaitFor),
           S_Acceptors = sets:size(Acceptors),
           if 
             S_WaitFor < S_Acceptors / 2 ->
