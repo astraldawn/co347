@@ -57,50 +57,18 @@ decide(Database, Slot_in, Slot_out, Requests, Proposals, Decisions, Leaders) ->
   end,
   C_Prime = maps:get(Slot_out, DecisionsMap),
   ProposalsList = sets:to_list(Proposals),
-  NewProposals = lists:filter(
-    fun(Proposal) ->
-      {S, _} = Proposal,
-      if
-        S == Slot_out -> false;
-        true -> true
-      end
-    end,
-    ProposalsList),
-  RemovedProposals = lists:filter(
-    fun(Proposal) ->
-      {S, _} = Proposal,
-      if
-        S == Slot_out -> true;
-        true -> false
-      end
-    end,
-    ProposalsList),
-  AdditionalRequests = lists:filter(
-    fun(Proposal) ->
-      {_, C_DoublePrime} = Proposal,
-      if
-        C_DoublePrime == C_Prime -> false;
-        true -> true
-      end
-    end,
-    RemovedProposals),
+  NewProposals = [{S, C} || {S, C} <- ProposalsList, S /= Slot_out],
+  RemovedProposals = [{S, C} || {S, C} <- ProposalsList, S == Slot_out],
+  AdditionalRequests = [{S, C} || {S, C} <- RemovedProposals, C /= C_Prime],
   NewRequests = sets:union(sets:from_list(AdditionalRequests), Requests),
   perform(Database, Slot_in, Slot_out, NewRequests, sets:from_list(NewProposals), Decisions, Leaders, C_Prime).
 
 perform(Database, Slot_in, Slot_out, Requests, Proposals, Decisions, Leaders, Command) ->
   % Check if command is already executed
   DecisionsList = sets:to_list(Decisions),
-  CommandExecutes = length(lists:filter(
-    fun(Decision) ->
-      {S, C} = Decision,
-      if
-        (S < Slot_out) and (C == Command) -> true;
-        true -> false
-      end
-    end,
-    DecisionsList)),
+  CommandExecuted = [ {S, C} || {S, C} <- DecisionsList, S < Slot_out, C == Command],
   if 
-    CommandExecutes == 0 -> 
+    CommandExecuted == [] -> 
       {Client, Cid, Op} = Command,
       Database ! {execute, Op},
       Client ! {response, Cid, ok};

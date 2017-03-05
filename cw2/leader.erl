@@ -55,14 +55,7 @@ pmax(Proposals, Pvalues) ->
   Slots = sets:to_list(sets:from_list([S || {_, S, _} <- PvaluesList])),
   MaxSlotsList = lists:map(
     fun(Slot) ->
-      CurSlotElems = lists:filter(
-        fun({_, S, _}) ->
-          if
-            S == Slot -> true;
-            true -> false
-          end
-        end,
-        PvaluesList),
+      CurSlotElems = [{B, S, C} || {B, S, C} <- PvaluesList, S == Slot],
       MaxElem = lists:max(CurSlotElems), % Return maximum for indiv slot (exploiting lexi ordering)
       {_, S, C} = MaxElem,
       {S, C}
