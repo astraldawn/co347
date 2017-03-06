@@ -4,8 +4,7 @@
 
 start(Leader, Acceptors, Replicas, Pvalue) ->
   [ Acceptor ! {p2a, self(), Pvalue} || Acceptor <- Acceptors ],
-  next(Leader, sets:from_list(Acceptors), Replicas, 
-      Pvalue, sets:from_list(Acceptors)).
+  next(Leader, Acceptors, Replicas, Pvalue, Acceptors).
 
 next(Leader, Acceptors, Replicas, Pvalue, WaitFor) ->
   {B, S, C} = Pvalue,
@@ -13,9 +12,9 @@ next(Leader, Acceptors, Replicas, Pvalue, WaitFor) ->
     {p2b, Acceptor, B_Prime} ->
       if
         B == B_Prime ->
-          NewWaitFor = sets:del_element(Acceptor, WaitFor),
-          S_WaitFor = sets:size(NewWaitFor),
-          S_Acceptors = sets:size(Acceptors),
+          NewWaitFor = WaitFor -- [Acceptor],
+          S_WaitFor = length(NewWaitFor),
+          S_Acceptors = length(Acceptors),
           if 
             S_WaitFor < S_Acceptors / 2 ->
               [Replica ! {decision, S, C} || Replica <- Replicas],

@@ -4,18 +4,17 @@
 
 start(Leader, Acceptors, B) ->
   [ Acceptor ! {p1a, self(), B} || Acceptor <- Acceptors ],
-  next(Leader, sets:from_list(Acceptors), B, 
-      sets:from_list(Acceptors), sets:new()).
+  next(Leader, Acceptors, B, Acceptors, []).
 
 next(Leader, Acceptors, B, WaitFor, Pvalues) ->
   receive
     {p1b, Acceptor, B_Prime, Accepted} ->
       if
         B == B_Prime ->
-          NewPvalues = sets:union(Pvalues, Accepted),
-          NewWaitFor = sets:del_element(Acceptor, WaitFor),
-          S_WaitFor = sets:size(NewWaitFor),
-          S_Acceptors = sets:size(Acceptors),
+          NewPvalues = Pvalues ++ Accepted,
+          NewWaitFor = WaitFor -- [Acceptor],
+          S_WaitFor = length(NewWaitFor),
+          S_Acceptors = length(Acceptors),
           if 
             S_WaitFor < S_Acceptors / 2 ->
               Leader ! {adopted, B, NewPvalues},

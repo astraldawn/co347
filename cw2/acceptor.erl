@@ -3,7 +3,7 @@
 -export([start/0]).
 
 start() ->
-  next({-1, self()}, sets:new()).
+  next({-1, self()}, []).
 
 next(Ballot_num, Accepted) ->
   receive
@@ -18,7 +18,7 @@ next(Ballot_num, Accepted) ->
       {B, _, _} = Pvalue,
       if
         B == Ballot_num ->
-          NewAccepted = sets:add_element(Pvalue, Accepted),
+          NewAccepted = Accepted ++ [Pvalue],
           Leader ! {p2b, self(), Ballot_num},
           next(Ballot_num, NewAccepted);
         true -> ok

@@ -49,11 +49,10 @@ next(Acceptors, Replicas, Ballot_Num, Active, Proposals) ->
   next(Acceptors, Replicas, Ballot_Num, Active, Proposals).
 
 pmax(Proposals, Pvalues) ->
-  PvaluesList = sets:to_list(Pvalues),
-  Slots = sets:to_list(sets:from_list([S || {_, S, _} <- PvaluesList])),
+  Slots = sets:to_list(sets:from_list([S || {_, S, _} <- Pvalues])),
   MaxSlotsList = lists:map(
     fun(Slot) ->
-      CurSlotElems = [{B, S, C} || {B, S, C} <- PvaluesList, S == Slot],
+      CurSlotElems = [{B, S, C} || {B, S, C} <- Pvalues, S == Slot],
       % Return maximum for indiv slot (exploiting lexi ordering)
       MaxElem = lists:max(CurSlotElems), 
       {_, S, C} = MaxElem,
