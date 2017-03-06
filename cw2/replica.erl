@@ -66,7 +66,7 @@ decide(Database, Slot_in, Slot_out, Requests,
   ProposalsList = sets:to_list(Proposals),
   NewProposals = [{S, C} || {S, C} <- ProposalsList, S /= Slot_out],
   RemovedProposals = [{S, C} || {S, C} <- ProposalsList, S == Slot_out],
-  AdditionalRequests = [{S, C} || {S, C} <- RemovedProposals, C /= C_Prime],
+  AdditionalRequests = [ C || {_, C} <- RemovedProposals, C /= C_Prime],
   NewRequests = sets:union(sets:from_list(AdditionalRequests), Requests),
   perform(Database, Slot_in, Slot_out, NewRequests,
           sets:from_list(NewProposals), Decisions, Leaders, C_Prime).
