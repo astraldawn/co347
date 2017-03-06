@@ -1,4 +1,4 @@
-
+# Chu Lee (cyl113) and Royson Lee (dsl114)
 # distributed algorithms, n.dulay, 4 jan 17
 # simple build and run makefile, v1
 
